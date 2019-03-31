@@ -2,7 +2,7 @@
 // Jay Allen
 // program: calendarcli.js
 // 3/28/19
-// GITHUB REPOSITORY:  remember this time
+// GITHUB REPOSITORY:  https://github.com/jayatOTC/CIS171-calendarcli
 // 
 
 //  const does not work had to use var
@@ -52,7 +52,7 @@ var daysInMonth = 0;  // used to make array of days begins as zero function load
 var dayOfMonth = moment().format('DD');
 // log("day of month is: " + dayOfMonth);
 
-var arrayOfDays = [];
+
 
 function printBlankLines(){
 //  Print 5 blank lines to separate months and begin with 5 blank lines to separate
@@ -64,12 +64,12 @@ function printBlankLines(){
 function printUnderscores(){
     // format and print a line of underscores
 
-    var underScore = "|";
+    var underScore = bar;
     for (sub = 0; sub <= 89; sub++)
     {
         underScore += "-";
     }
-    underScore += "|";
+    underScore += bar;
     log(underScore);
 }   // end of function printUnderscores
 
@@ -79,11 +79,11 @@ function printFillerLine(){
     //  after holiday line
     //  and after birthday line 
     //  in the date fields of the calendar
-    var fillerLine = "|";
+    var fillerLine = bar;
     var spaces = "        ";
     for (sub = 0; sub <= 6; sub++) {
         fillerLine += lodash.pad(spaces, 12);
-        fillerLine += "|";
+        fillerLine += bar;
     }
     log(fillerLine);
 }   // end of function printFillerLine
@@ -95,8 +95,8 @@ function printMonth(){
     // the beginning month is the month after the current month
     processedMonths++;  
     printedMonth = moment().add(processedMonths, 'M').format('MMMM');
-    currentDate = currentDate.add(1, 'M');
-    log("current date = " + currentDate);
+    currentDate = currentDate.add(1, 'Month');
+    // log("current date = " + currentDate.format('YYYY-MM-DD'));
 
     
     //  printedMonth = "January";  used to check print of january  with year.
@@ -137,31 +137,30 @@ function getDaysinMonth(){
     //
     //  processedMonths is checked to determine how many days are in the current month
     //  30 or 31
-    
+     var checkMonth = moment(currentDate).startOf('month').format('M');
 
-    if (processedMonths == 1 || processedMonths == 3 || processedMonths == 5 ||
-        processedMonths == 7 || processedMonths == 8 || processedMonths == 10 ||
-        processedMonths == 12)
+    if (checkMonth == 1 || checkMonth == 3 || checkMonth == 5 ||
+        checkMonth == 7 || checkMonth == 8 || checkMonth == 10 ||
+        checkMonth == 12)
         // all the rest have 31 except {see second else}
        {
            daysInMonth = 31;
        }
     else
-    if (processedMonths == 4 || processedMonths == 6 || processedMonths == 9 ||
-        processedMonths == 11)
+    if (checkMonth == 4 || checkMonth == 6 || checkMonth == 9 ||
+        checkMonth == 11)
         // 30 days hath September, April, June, and November
-    {
         daysInMonth = 30;
-    }
     else
-    if (moment(currentYear).isLeapYear())
+    if (moment(currentDate).isLeapYear())
         // February  
     {
-        DaysInMonth = 29;   //  it is a leap year
+        daysInMonth = 29;   //  it is a leap year
     }
     else
     {   
-        DaysInMonth = 28;  //  not a leap year
+        daysInMonth = 28;  //  not a leap year
+
     }   // end of if else stream
 
 } // end of function getDaysinMonth
@@ -170,38 +169,75 @@ function getDaysinMonth(){
 function arrayofDates() 
 {
     //  Determine day of week for first day of month
+    var startOfMonth = moment(currentDate).startOf('month').format('YYYY-MM-DD');
+    var 
+    // log ("start of Month = " + startOfMonth);
+    firstDay = moment(startOfMonth).day();
+    // log ("firstDay is: " + firstDay);
 
-    firstDay = moment(currentDate).day();
 
-    log ("firstDay is: " + firstDay);
+    // we already have the number of days in the month
     // first day is the day of the week the month starts on
     // dayfiller will be firstDay - 1 plus the DaysInMonth;
-    var totalDays = (firstDay - 1 + daysInMonth);
+    var totalDays = (firstDay + daysInMonth);
+    
+    // log("Total days in month " + daysInMonth);
+    var arrayOfDays = [];
+    // print the set up and print the calendar dates under the correct days of the week.
 
-    log("Total days in month " + totalDays);
-    /* 
-        for (sub = 0; sub <= 1; sub--)
+    for (sub = 1; sub <= totalDays; sub++)
+    {
+        if (sub <= firstDay && firstDay > 0)
         {
-            arrayOfDays.push(sub);
+            arrayOfDays.push("");
         }
-        log(arrayOfDays);
-    */
-//    }
-}
-//
+        else
+        {
+            arrayOfDays.push (sub - firstDay);
+        
+        }  // end of inner if else
+    }   // end of for
+    
+    //  chunk array into groups of seven
+    var weeks = arrayOfDays.length / 7;
+    var chunkedDays = lodash.chunk(arrayOfDays, 7);
+    var dayString = bar;
+
+    for (outerSub = 0; outerSub < weeks; outerSub ++)
+    {
+        for (innerSub = 0; innerSub < 7; innerSub ++)
+        { 
+            if (printedMonth == "March" && chunkedDays [outerSub] [innerSub] == 26)
+            {
+                dayString += chalk.whiteBright.bgRed(lodash.pad(chunkedDays [outerSub] [innerSub], 12));
+                dayString += bar;
+            } // my birthday
+            else
+            if (printedMonth == "November" && chunkedDays [outerSub] [innerSub] == 26)
+            {
+                    dayString += chalk.whiteBright.bgRed(lodash.pad(chunkedDays[outerSub][innerSub], 12));
+                    dayString += bar;
+            }
+            else    // end of anniversary and yes both are on the 26th of the month
+            {
+                dayString += chalk.yellow(lodash.pad(chunkedDays[outerSub][innerSub], 12));
+                dayString += bar;
+            }   // end of if  else
+        } // end of inner loop
+        console.log(dayString);
+        dayString = bar;
+        
+    } // end of outer loop
+    printUnderscores();
+}   // end of print month
    
-function arrayOfHolidays(){
-
-}
-
 // PROCEDURE DIVISION --  if we were doing COBOL
 
 //  print 5 blank lines to separate output from the garbage generated by the system.
-for (subscr = 0 ; subscr <= 11; subscr++){
+for (subscr = 0; subscr <= 11; subscr++){
 
     printBlankLines();
     printUnderscores();
-    // determineYear();
     printMonth();
     printYear();
     printUnderscores();
@@ -220,30 +256,5 @@ for (subscr = 0 ; subscr <= 11; subscr++){
     //     fill the array.  if the final day of the month is a Tuesday, the final 3 elements will
     //     contain spaces.
     arrayofDates();
-
-    // build another array containing holidays in that month that matches the holidays with the 
-    // correct numbers in the ArrayOfDates.  
-    // i.e.  independence day must fall on the same element in the holiday array as the number 4
-    //       in the july ArrayOfDates.
-    //arrayOfHolidays();
-
-    //build a third array containing birthdays.  same logic as ArrayOfHolidays but
-    //  Jays' birthday must match the same element as March 26 does in the Arrayof dates.
-
-    //
-    // chunk the ArrayOfDates, ArrayOfHolidays, and ArrayOfBirthdays into sets of seven.
-
-    // print the chunked sets of dates, holidays, and birthdays. 
-    // the first set must be printed of each in order, then a line of dashes (misnamed inderscores) 
-    // then a blank line then the second set, followed by however many sets must be printed to
-    // print the entire month.  Usually for or five sets.  
-    //  if the first of the month falls on a Saturday and there are 31 days in the month there
-    //  will be 6 chunks to process. so we will check if the array is complete at the end of 
-    //  each chunk.  
-    //printTheChunks();
-
-    //     add one to the month we are processing and 
-    //     continue until 12 months are printed.
-
 
 }   // end of mainline
